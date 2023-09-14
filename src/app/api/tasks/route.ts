@@ -1,3 +1,4 @@
+import { Tasks } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { CreateTaskDTO } from "~/entities/task/dto/create-task.dto";
@@ -6,7 +7,7 @@ import { db } from "~/infra/database/prisma/db";
 export async function GET() {
   const todos = await db.tasks.findMany({
     orderBy: {
-      dropdown_order: "desc",
+      dropdown_order: "asc",
     },
   });
 
@@ -20,6 +21,7 @@ export async function POST(request: Request) {
     data: {
       dropdown_order: body.dropdown_order,
       title: body.title,
+      id: body.id,
     },
   });
 
@@ -28,20 +30,21 @@ export async function POST(request: Request) {
   return NextResponse.json(todo);
 }
 
-export async function PATCH(request: Request) {
-  const body: any = await request.json();
+export async function PUT(request: Request) {
+  const body: {
+    newOrder: number[];
+  } = await request.json();
 
-  const updatedData = await db.tasks.update({
-    where: {
-      id: body.id,
-      title: body.title,
-    },
-    data: {
-      completed: body.completed,
-    },
-  });
+  const updateData = body.newOrder.map((taskId, index) => ({
+    where: { id: taskId },
+    data: { dropdown_order: index },
+  }));
+
+  for (const data of updateData) {
+    await db.tasks.update(data);
+  }
 
   revalidatePath("/");
 
-  return NextResponse.json(updatedData);
+  return NextResponse.json({});
 }

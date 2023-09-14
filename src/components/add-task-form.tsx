@@ -20,17 +20,20 @@ export function AddTaskForm() {
   const { setTasks, tasks } = useTasks();
 
   function onSubmit(data: AddTaskType) {
+    const now = new Date().getUTCMilliseconds();
+    const id = Math.floor(Math.random() * now);
     const payload = {
       title: data.title,
       dropdown_order: tasks?.length ?? 0,
+      id,
     };
 
     api.post("/tasks", payload);
-    updateOptmistic(data.title);
+    updateOptmistic(id, data.title);
     reset();
   }
 
-  function updateOptmistic(title: string) {
+  function updateOptmistic(id: number, title: string) {
     if (!tasks) return;
 
     const newDropdownOrder = tasks?.length ?? 0;
@@ -40,7 +43,7 @@ export function AddTaskForm() {
       completed: false,
       deleted_at: null,
       dropdown_order: newDropdownOrder,
-      id: Math.random(),
+      id,
       created_at: new Date(),
       updated_at: new Date(),
     };

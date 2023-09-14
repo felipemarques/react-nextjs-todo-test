@@ -2,6 +2,9 @@
 
 import { Tasks } from "@prisma/client";
 import React, { createContext, useContext, useMemo, useState } from "react";
+import { DropResult } from "react-beautiful-dnd";
+import { toast } from "react-hot-toast";
+import { db } from "~/infra/database/prisma/db";
 import { api } from "~/services/api";
 
 interface ContextValues {
@@ -15,11 +18,17 @@ interface ContextValues {
     title: string;
   } | null;
   onEditTask: (id: number, oldTitle: string) => void;
+  onDragEnd: (dropResult: DropResult) => Promise<void>;
 }
 
 const TasksContext = createContext({} as ContextValues);
 
 export const useTasks = () => useContext(TasksContext);
+
+export enum DragStatus {
+  DRAGGING = "DRAGGING",
+  DONE = "DONE",
+}
 
 export function TasksProvider({ children }: { children: React.ReactNode }) {
   const [tasks, setTasks] = useState<Tasks[] | null>(null);
@@ -51,8 +60,7 @@ export function TasksProvider({ children }: { children: React.ReactNode }) {
   }
 
   function updateCompletedOnDb(id: number, completed: boolean) {
-    return api.patch("/tasks", {
-      id,
+    return api.patch(`/tasks/${id}`, {
       completed,
     });
   }
@@ -92,6 +100,34 @@ export function TasksProvider({ children }: { children: React.ReactNode }) {
     setEditingTask({ id, title: oldText });
   }
 
+  async function onDragEnd(dropResult: DropResult) {
+    if (!tasks) return;
+    if (!dropResult.destination) return;
+
+    const { source, destination } = dropResult;
+
+    const updatedTasks = [...tasks];
+    const [draggedTask] = updatedTasks.splice(source.index, 1);
+    updatedTasks.splice(destination.index, 0, draggedTask);
+
+    const updatedTasksWithDropdownOrder = updatedTasks.map((task, index) => ({
+      ...task,
+      dropdown_order: index,
+    }));
+
+    setTasks(updatedTasksWithDropdownOrder);
+
+    const newOrder = updatedTasksWithDropdownOrder.map((task) => task.id);
+    await updateDropdownOrderOnDb(newOrder);
+    toast.success("Saved!");
+  }
+
+  function updateDropdownOrderOnDb(newOrder: number[]) {
+    return api.put(`/tasks`, {
+      newOrder,
+    });
+  }
+
   const memoizedValues = useMemo(
     () => ({
       tasks,
@@ -101,6 +137,7 @@ export function TasksProvider({ children }: { children: React.ReactNode }) {
       onOrderByCompletedStatus,
       onEditTask,
       editingTask,
+      onDragEnd,
     }),
     [tasks]
   );

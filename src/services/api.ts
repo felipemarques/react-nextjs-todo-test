@@ -1,6 +1,3 @@
-import { revalidatePath } from "next/cache";
-import { TASKS_TAG } from "~/constants/tags/tasks.tags";
-
 class Api {
   private baseUrl: string;
 
@@ -47,16 +44,14 @@ class Api {
     });
   }
 
-  public async patch<TData>(url: string, body: any) {
-    const response = await fetch(`${this.baseUrl}${url}`, {
+  async patch<TData>(url: string, body: any) {
+    return fetch(`${this.baseUrl}${url}`, {
       method: "PATCH",
       headers: {
         ...this._contentTypeJson(),
       },
       body: JSON.stringify(body),
     });
-
-    return response.json() as TData | null;
   }
 
   private _contentTypeJson() {
