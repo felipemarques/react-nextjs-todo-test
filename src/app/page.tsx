@@ -1,9 +1,9 @@
+import { AddTaskForm } from "~/components/add-task-form";
 import { CountTasks } from "~/components/count-tasks";
+import { TaskFilters } from "~/components/task-filters";
 import { Tasks } from "~/components/tasks";
-import { AddButton } from "~/components/ui/add-button";
-import { Input } from "~/components/ui/input";
 import { PageTitle } from "~/components/ui/page-title";
-import { addTodo } from "~/server-actions/add-todo";
+import { TasksProvider } from "~/context/tasks-context";
 
 export default function Home() {
   return (
@@ -12,14 +12,11 @@ export default function Home() {
         <PageTitle>Tasks</PageTitle>
         <CountTasks />
       </div>
-      <form action={addTodo}>
-        <Input
-          placeholder="New task"
-          name="title"
-          rightElement={<AddButton />}
-        />
-      </form>
-      <Tasks />
+      <TasksProvider>
+        <AddTaskForm />
+        <TaskFilters />
+        <Tasks />
+      </TasksProvider>
     </main>
   );
 }

@@ -1,3 +1,6 @@
+import { revalidatePath } from "next/cache";
+import { TASKS_TAG } from "~/constants/tags/tasks.tags";
+
 class Api {
   private baseUrl: string;
 
@@ -5,8 +8,8 @@ class Api {
     this.baseUrl = baseUrl;
   }
 
-  public async get<TData>(url: string) {
-    const response = await fetch(`${this.baseUrl}${url}`);
+  public async get<TData>(url: string, requestInit?: RequestInit) {
+    const response = await fetch(`${this.baseUrl}${url}`, requestInit);
 
     return response.json() as TData | null;
   }
@@ -35,12 +38,13 @@ class Api {
     return response.json() as TData | null;
   }
 
-  public async delete<TData>(url: string) {
-    const response = await fetch(`${this.baseUrl}${url}`, {
+  public delete<TData>(url: string) {
+    return fetch(`${this.baseUrl}${url}`, {
       method: "DELETE",
+      headers: {
+        ...this._contentTypeJson(),
+      },
     });
-
-    return response.json() as TData | null;
   }
 
   public async patch<TData>(url: string, body: any) {
