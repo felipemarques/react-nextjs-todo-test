@@ -3,11 +3,11 @@
 import { Tasks } from "@prisma/client";
 import { useEffect } from "react";
 import { DeleteTaskButton } from "./delete-task-button";
-import { DragStatus, useTasks } from "~/context/tasks-context";
+import { useTasks } from "~/context/tasks-context";
 import { CompleteTaskButton } from "./complete-task-button";
 import { completedBg } from "~/utils/tasks/completed-bg";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
-import { Toaster, toast } from "react-hot-toast";
+import { Toaster } from "react-hot-toast";
 
 export function TaskList({ serverTasks }: { serverTasks: Tasks[] | null }) {
   const {

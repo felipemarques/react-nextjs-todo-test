@@ -1,4 +1,3 @@
-import { Tasks } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
 import { CreateTaskDTO } from "~/entities/task/dto/create-task.dto";

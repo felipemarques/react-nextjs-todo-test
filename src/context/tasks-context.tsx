@@ -4,7 +4,6 @@ import { Tasks } from "@prisma/client";
 import React, { createContext, useContext, useMemo, useState } from "react";
 import { DropResult } from "react-beautiful-dnd";
 import { toast } from "react-hot-toast";
-import { db } from "~/infra/database/prisma/db";
 import { api } from "~/services/api";
 
 interface ContextValues {
