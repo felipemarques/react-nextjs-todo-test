@@ -44,7 +44,7 @@ export function TaskList({ serverTasks }: { serverTasks: Tasks[] | null }) {
                     ref={provided.innerRef}
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
-                    className={`flex w-96 relative ${completedBg(
+                    className={`flex w-96 relative text-black ${completedBg(
                       task.completed
                     )} p-2 rounded-md cursor-pointer`}
                   >
