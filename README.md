@@ -1,3 +1,5 @@
+<img src="./public/print-screen.png" alt="Alt text" title="Optional title">
+
 # RUNNING
 
 ```
